@@ -23,7 +23,7 @@ from backend.scout.engine import ScoutEngine
 from backend.agents.orchestrator import AgentOrchestrator
 from backend.agents.gateway import GATEWAY
 from backend.agents.recap import MatchRecapAgent
-from backend.vision.scout import VideoScoutAgent
+from backend.vision.scout import TrajectoryScout
 from backend.mcp_server.server import PitchSenseMCPServer
 from backend.api.a2a import get_agent_card
 
@@ -51,7 +51,7 @@ class ReplayManager:
         self.generator = SyntheticMatchGenerator(seed=seed)
         self.scout = ScoutEngine(match_id=f"seed-{seed}")
         self.orchestrator = AgentOrchestrator()
-        self.video_scout = VideoScoutAgent(tolerance_m=2.0)
+        self.video_scout = TrajectoryScout(tolerance_m=2.0)
         self.mcp_server = PitchSenseMCPServer(self.scout, self.orchestrator, self.video_scout)
         
         self.active_connections: List[WebSocket] = []
@@ -75,7 +75,7 @@ class ReplayManager:
         self.generator = SyntheticMatchGenerator(seed=seed)
         self.scout = ScoutEngine(match_id=f"seed-{seed}")
         self.orchestrator = AgentOrchestrator()
-        self.video_scout = VideoScoutAgent(tolerance_m=2.0)
+        self.video_scout = TrajectoryScout(tolerance_m=2.0)
         self.mcp_server = PitchSenseMCPServer(self.scout, self.orchestrator, self.video_scout)
         self._load_or_generate_fixture()
 
@@ -125,7 +125,7 @@ class ReplayManager:
                     "summary": self.scout.get_summary_snapshot(),
                     "cue": cue,
                     "trajectory_estimate": video_detection,
-                    "video_accuracy": self.video_scout.get_reconciliation_summary(),
+                    "trajectory_accuracy": self.video_scout.get_reconciliation_summary(),
                     "progress": {
                         "current_index": self.event_index,
                         "total_events": len(self.events_cache),
@@ -155,7 +155,7 @@ async def websocket_match_stream(websocket: WebSocket):
         "summary": REPLAY.scout.get_summary_snapshot(),
         "cues": REPLAY.orchestrator.get_all_cues(),
         "refusals": REPLAY.orchestrator.get_refusal_log(),
-        "video_accuracy": REPLAY.video_scout.get_reconciliation_summary(),
+        "trajectory_accuracy": REPLAY.video_scout.get_reconciliation_summary(),
         "is_running": REPLAY.is_running,
         "speed": REPLAY.speed,
         "offline_mode": GATEWAY.is_offline()
@@ -241,8 +241,8 @@ async def get_refusals():
         "refusals": REPLAY.orchestrator.get_refusal_log()
     }
 
-@app.get("/api/vision/summary")
-async def vision_summary():
+@app.get("/api/trajectory/summary")
+async def trajectory_summary():
     return REPLAY.video_scout.get_reconciliation_summary()
 
 class ReplayControlRequest(BaseModel):
@@ -295,11 +295,11 @@ async def ask_the_match(req: AskRequest):
         p_bra = summary['passes']['BRA']
         ans = f"Passes: SAL completed {p_sal['completed']}/{p_sal['attempted']} ({round(p_sal['completed']/max(1, p_sal['attempted'])*100, 1)}%), BRA completed {p_bra['completed']}/{p_bra['attempted']} ({round(p_bra['completed']/max(1, p_bra['attempted'])*100, 1)}%)."
     elif "accuracy" in q or "vision" in q or "video" in q:
-        vision_summary = REPLAY.video_scout.get_reconciliation_summary()
-        if vision_summary["total_detections"] == 0:
+        trajectory_summary = REPLAY.video_scout.get_reconciliation_summary()
+        if trajectory_summary["total_detections"] == 0:
             ans = "No trajectory-to-ground-truth measurements have been recorded yet. Start the replay to collect measurements."
         else:
-            ans = f"Measured trajectory distance agreement vs generated ground truth is {vision_summary['agreement_percentage']}% across {vision_summary['total_detections']} observations at ±{vision_summary['tolerance_meters']}m tolerance. This is not image-based event detection accuracy."
+            ans = f"Measured trajectory distance agreement vs generated ground truth is {trajectory_summary['agreement_percentage']}% across {trajectory_summary['total_detections']} observations at ±{trajectory_summary['tolerance_meters']}m tolerance. This is not image-based event detection accuracy."
     else:
         ans = f"Match Minute {int(summary['minute'])}': Saltmarsh {summary['score']['SAL']} - {summary['score']['BRA']} Brackfield. Control Index: SAL {summary['control_index']['SAL']} vs BRA {summary['control_index']['BRA']}."
 

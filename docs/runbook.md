@@ -21,7 +21,7 @@ make replay
 
 Open `http://localhost:8000` in any modern web browser.
 * Press `▶ PLAY` to start live event replay.
-* Observe the TV HUD overlays and the live VideoScout optical tracking reticle.
+* Observe the synthetic pitch visualization and trajectory-derived metrics.
 * Use the Producer Desk to `TAKE` or `KILL` incoming broadcast cues.
 * Switch viewer lenses (Analyst, Casual, Player-Focus) or language (EN / ES).
 * Test the **"Ask the Match"** console to query match statistics.
@@ -33,12 +33,9 @@ Open `http://localhost:8000` in any modern web browser.
 PitchSense supports a provider-agnostic gateway. Set your keys in `.env`:
 
 ```env
-# Microsoft Foundry (Production Hero Path)
+# Optional Azure OpenAI-compatible chat endpoint
 AZURE_OPENAI_API_KEY="your-azure-key"
 AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
-
-# Together AI (Development Workbench & Failover)
-TOGETHER_API_KEY="your-together-key"
 
 # Force offline mode (0 = live models, 1 = offline deterministic)
 PSENSE_FAKE_MODEL="0"
@@ -118,9 +115,9 @@ Azure references: [Deploy from local source with `az containerapp up`](https://l
 
 ---
 
-## 4. Connecting via MCP (Model Context Protocol)
+## 4. Using the Scout HTTP tools
 
-PitchSense exposes read-only Scout tools over MCP:
+PitchSense exposes a project-specific JSON HTTP tool catalog. This endpoint is not an MCP protocol server.
 
 * Endpoint: `POST /api/mcp`
 * Tool Catalog: `GET /api/mcp/tools`
@@ -128,14 +125,14 @@ PitchSense exposes read-only Scout tools over MCP:
   - `get_match_summary`: Returns score, xG, momentum, and chaos indices.
   - `get_player_stats`: Returns player completion rates and high-pressure touches.
   - `verify_cue_evidence`: Audits grounding citations for any broadcast cue.
-  - `get_auto_eventing_accuracy`: Returns VideoScout vision agreement percentage.
+  - `get_auto_eventing_accuracy`: Returns measured trajectory-distance agreement against generated ground-truth distances; it is not image-based detection accuracy.
 
 ---
 
-## 5. Agent-to-Agent (A2A) Discovery
+## 5. Service discovery
 
-The machine-readable A2A Agent Card is accessible at:
+The project's service information JSON is accessible at:
 ```
 http://localhost:8000/.well-known/agent-card.json
 ```
-Adheres to the Microsoft Agent Framework A2A card standard.
+This project-specific document is not a standards-compliant A2A agent card.

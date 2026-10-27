@@ -18,11 +18,11 @@ Respond in valid JSON with:
   "actor_code": "sal_XX" | "bra_XX",
   "recipient_code": "sal_XX" | "bra_XX" | null,
   "confidence": float between 0.0 and 1.0,
-  "rationale": "Short explanation of visual trajectory cues"
+  "rationale": "Short explanation of trajectory cues"
 }
 """
 
-class VideoScoutAgent:
+class TrajectoryScout:
     def __init__(self, gateway=GATEWAY, tolerance_m: float = 2.0):
         self.gateway = gateway
         self.tolerance_m = tolerance_m
@@ -85,7 +85,7 @@ class VideoScoutAgent:
         except Exception:
             classification = json.loads(fallback_vision())
 
-        # Construct auto-event
+        # Construct trajectory estimate
         detected_event = {
             "type": "trajectory_estimate",
             "action": classification.get("detected_action", "pass"),

@@ -35,7 +35,7 @@ def test_ask_the_match_qa():
     assert "Expected Goals" in data["answer"]
 
 def test_trajectory_agreement_starts_without_measurements():
-    resp = client.get("/api/vision/summary")
+    resp = client.get("/api/trajectory/summary")
     assert resp.status_code == 200
     data = resp.json()
     assert data["total_detections"] == 0
