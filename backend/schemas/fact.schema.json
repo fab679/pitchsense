@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PitchSenseFactSheet",
+  "type": "object",
+  "required": ["moment_id", "match_id", "t_code", "minute", "trigger_type", "team", "facts", "context"],
+  "properties": {
+    "moment_id": {
+      "type": "string"
+    },
+    "match_id": {
+      "type": "string"
+    },
+    "t_code": {
+      "type": "string"
+    },
+    "minute": {
+      "type": "number"
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "goal",
+        "shot_threat",
+        "line_break_pass",
+        "high_press_turnover",
+        "momentum_shift",
+        "control_surge",
+        "chaos_spike",
+        "tactical_alert",
+        "player_milestone"
+      ]
+    },
+    "team": {
+      "type": "string"
+    },
+    "players": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fact_id", "name", "value", "unit", "events"],
+        "properties": {
+          "fact_id": { "type": "string" },
+          "name": { "type": "string" },
+          "value": { "type": ["number", "string", "boolean"] },
+          "unit": { "type": "string" },
+          "events": {
+            "type": "array",
+            "items": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "object",
+          "properties": {
+            "home": { "type": "integer" },
+            "away": { "type": "integer" }
+          }
+        },
+        "home_team": { "type": "string" },
+        "away_team": { "type": "string" },
+        "momentum_diff": { "type": "number" },
+        "control_index": { "type": "number" },
+        "chaos_index": { "type": "number" },
+        "high_press_payoff": { "type": "boolean" }
+      }
+    }
+  }
+}

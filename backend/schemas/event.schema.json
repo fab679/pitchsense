@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PitchSenseEvent",
+  "type": "object",
+  "required": ["seq", "match_id", "t_code", "minute", "type", "team", "pos"],
+  "properties": {
+    "seq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonically increasing sequence number within the match"
+    },
+    "match_id": {
+      "type": "string",
+      "description": "Unique identifier for the match, e.g. seed-21"
+    },
+    "t_code": {
+      "type": "string",
+      "pattern": "^[0-9]+:[0-9]{2}\\.[0-9]$",
+      "description": "Match timestamp mm:ss.f"
+    },
+    "minute": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 130
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "shot",
+        "goal",
+        "tackle",
+        "possession_change",
+        "pressure",
+        "card",
+        "sub",
+        "whistle",
+        "metadata",
+        "video_detection"
+      ]
+    },
+    "team": {
+      "type": "string",
+      "description": "Team identifier abbreviation (e.g. SAL, BRA)"
+    },
+    "actor": {
+      "type": "string",
+      "description": "Player identifier code"
+    },
+    "actor_name": {
+      "type": "string"
+    },
+    "recipient": {
+      "type": "string",
+      "description": "Receiving player identifier code if applicable"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "pos": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 105 },
+        "y": { "type": "number", "minimum": 0, "maximum": 68 }
+      }
+    },
+    "end_pos": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 105 },
+        "y": { "type": "number", "minimum": 0, "maximum": 68 }
+      }
+    },
+    "derived": {
+      "type": "object",
+      "properties": {
+        "pass_distance_m": { "type": "number" },
+        "pass_accuracy": { "type": "number" },
+        "pass_difficulty": { "type": "number", "minimum": 0, "maximum": 100 },
+        "ball_speed_kmh": { "type": "number" },
+        "shot_speed_kmh": { "type": "number" }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "properties": {
+        "pressure_at_receipt": { "type": "number", "minimum": 0, "maximum": 1 },
+        "under_pressure": { "type": "boolean" }
+      }
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["complete", "incomplete", "blocked", "saved", "off_target", "scored", "fouled", "won", "lost"]
+    },
+    "detection_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Set when event is emitted by VideoScout vision tracking"
+    }
+  }
+}

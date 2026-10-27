@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PitchSenseBroadcastCue",
+  "type": "object",
+  "required": [
+    "cue_id",
+    "match_id",
+    "t_code",
+    "ann",
+    "kind",
+    "priority",
+    "audience",
+    "lang",
+    "ttl_ms",
+    "payload",
+    "status"
+  ],
+  "properties": {
+    "cue_id": {
+      "type": "string",
+      "description": "Unique identifier for cue, e.g. seed-21-0007"
+    },
+    "match_id": {
+      "type": "string"
+    },
+    "t_code": {
+      "type": "string"
+    },
+    "ann": {
+      "type": "string",
+      "description": "Match minute annotation, e.g. 63'"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["lower_third", "stat_card", "breakout_banner", "spotlight", "ticker"]
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Broadcast priority: 1 (highest / goal / red card) to 5 (ambient stat)"
+    },
+    "audience": {
+      "type": "string",
+      "enum": ["analyst", "casual", "player_focus", "club_focus", "single_metric"]
+    },
+    "lang": {
+      "type": "string",
+      "enum": ["en", "es"]
+    },
+    "ttl_ms": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 30000,
+      "description": "Time to live on screen in milliseconds"
+    },
+    "payload": {
+      "type": "object",
+      "required": ["headline", "detail", "evidence", "why"],
+      "properties": {
+        "headline": { "type": "string" },
+        "detail": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of fact and event IDs grounding this cue"
+        },
+        "why": { "type": "string" }
+      }
+    },
+    "players": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "taken", "killed", "onair", "expired"]
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string" },
+        "model": { "type": "string" },
+        "in_tokens": { "type": "integer" },
+        "out_tokens": { "type": "integer" },
+        "est_cost_usd": { "type": "number" },
+        "latency_ms": { "type": "number" },
+        "validated": { "type": "boolean" },
+        "attempts": { "type": "integer" }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "properties": {
+        "reviewed_by": { "type": ["string", "null"] },
+        "taken_at": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
